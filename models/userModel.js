@@ -2,12 +2,12 @@ require('dotenv').config({path:'../.env'})
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const uuid = require('uuid')
+const { v4: uuidv4 } = require('uuid');
 
 const userSchema = new mongoose.Schema({
-    Id:{
+    id:{
         type:String,
-        default:uuid(),
+        default:  uuidv4(),
         require:true,
         unique:true,
         trim:true
@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
         require:true,
         lowercase:true,
     },
-    firstName:{
+    lastName:{
         type:String,
         require:true,
         lowercase:true,
@@ -27,42 +27,33 @@ const userSchema = new mongoose.Schema({
         required:true,
         trim:true,
         unique:true,
-        validate(value){
-            if(!Validator.isEmail(value)){
-                flags("Email format is not correct")
-            }
-        }
     },
     password:{
         type:String,
         required:true,
         trim:true,
         minLength:7,
-          validate(value){
-              if(value.toLowerCase().includes('password')){
-                  flags('Password cannot contain "Password"')
-              }
-          }
       },
-      UserType:{
-          type:String,
-          require:true,
-          trim:true,
-          lowercase:true
 
-      },
-      token:{
-          type:String,
-      },
-      initialSetup:{
-          type:Boolean,
-          default:false
-      }
+    phoneNo:{
+        type:Number,
+        required:true,
+        trim:true,
+
+    },
+    interest:{
+        type:Number,
+        required:true,
+
+    },
+    category:{
+        type:Number,
+        required:true,
+    }  
     
 },
 {
     timestamps:true,
-
 }
 )
 
@@ -82,14 +73,14 @@ userSchema.methods.toJSON = function (){
         next()
         })
 
-        userSchema.statics.findByCredentials = async (username, password)=>{
+        userSchema.statics.findByCredentials = async (username, password) => {
             const user = await User.findOne({username})
             if(!user){
-                flags(undefined,401)
+               throw new Error('User not found')
             }
             const isMatch = await bcrypt.compare(password,user.password)
             if(!isMatch){
-               throw new Error('Password is ')
+               throw new Error('Password is wrong')
             }
             return user
         }

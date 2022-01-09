@@ -1,6 +1,7 @@
 require('dotenv').config({path:'../config/.env'})
 const jwt = require('jsonwebtoken')
 const mongoose = require("mongoose")
+const User = require('../models/userModel')
 const auth = async (req, res , next) =>{
     try {
         const token = req.header('Authorization').replace('Bearer ','')
